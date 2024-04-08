@@ -274,7 +274,7 @@ class DOFA(nn.Module):
         if self.global_pool:
             norm_layer = norm_layer
             embed_dim = embed_dim
-            self.fc_norm = norm_layer(embed_dim)
+            self.norm = norm_layer(embed_dim)
         else:
             self.norm = norm_layer(embed_dim)
 
@@ -336,7 +336,7 @@ class DOFA(nn.Module):
 
         if self.global_pool:
             x = x[:, 1:, :].mean(dim=1)  # global pool without cls token
-            outcome: Tensor = self.fc_norm(x)
+            outcome: Tensor = self.norm(x)
         else:
             x = self.norm(x)
             outcome = x[:, 0]

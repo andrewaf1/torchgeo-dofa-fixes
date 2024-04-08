@@ -73,7 +73,7 @@ class TransformerWeightGenerator(nn.Module):
             activation="gelu",
             norm_first=False,
             batch_first=False,
-            dropout=False,
+            dropout=0.0,
         )
         self.transformer_encoder = nn.TransformerEncoder(
             encoder_layer, num_layers=num_layers, enable_nested_tensor=False

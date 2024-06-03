@@ -308,6 +308,34 @@ class DOFA(nn.Module):
             nn.Linear(embed_dim, num_classes) if num_classes > 0 else nn.Identity()
         )
 
+    def forward_features_unpooled(self, x: Tensor, wavelengths: list[float]) -> Tensor:
+        """Forward pass of the feature embedding layer.
+
+        Args:
+            x: Input mini-batch.
+            wavelengths: Wavelengths of each spectral band (μm).
+
+        Returns:
+            Output mini-batch.
+        """
+        # embed patches
+        wavelist = torch.tensor(wavelengths, device=x.device).float()
+        self.waves = wavelist
+
+        x, _ = self.patch_embed(x, self.waves)
+
+        x = x + self.pos_embed[:, 1:, :]
+        # append cls token
+        cls_token = self.cls_token + self.pos_embed[:, :1, :]
+        cls_tokens = cls_token.expand(x.shape[0], -1, -1)
+        x = torch.cat((cls_tokens, x), dim=1)
+
+        # apply Transformer blocks
+        for block in self.blocks:
+            x = block(x)
+
+        return x[:, 1:, :]
+
     def forward_features(self, x: Tensor, wavelengths: list[float]) -> Tensor:
         """Forward pass of the feature embedding layer.
 

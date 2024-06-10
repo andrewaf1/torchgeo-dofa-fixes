@@ -248,6 +248,7 @@ class DOFA(nn.Module):
         num_classes: int = 45,
         global_pool: bool = True,
         mlp_ratio: float = 4.0,
+        out_indices=(2, 5, 8, 11),
         norm_layer: type[nn.Module] = partial(
             nn.LayerNorm, eps=1e-6
         ),  # type: ignore[assignment]
@@ -269,6 +270,7 @@ class DOFA(nn.Module):
         """
         super().__init__()
 
+        self.out_indices = out_indices
         self.dynamic_embed_dim = dynamic_embed_dim
         self.global_pool = global_pool
         if self.global_pool:
@@ -308,6 +310,8 @@ class DOFA(nn.Module):
             nn.Linear(embed_dim, num_classes) if num_classes > 0 else nn.Identity()
         )
 
+        self.hw = img_size // self.patch_embed.kernel_size
+
     def forward_features_unpooled(self, x: Tensor, wavelengths: list[float]) -> Tensor:
         """Forward pass of the feature embedding layer.
 
@@ -335,6 +339,40 @@ class DOFA(nn.Module):
             x = block(x)
 
         return x[:, 1:, :]
+    
+    def forward_spatial_features(self, x: Tensor, wavelengths: list[float]) -> Tensor:
+        """Forward pass of the feature embedding layer.
+
+        Args:
+            x: Input mini-batch.
+            wavelengths: Wavelengths of each spectral band (μm).
+
+        Returns:
+            Output mini-batch.
+        """
+        # embed patches
+        wavelist = torch.tensor(wavelengths, device=x.device).float()
+        self.waves = wavelist
+
+        x, _ = self.patch_embed(x, self.waves)
+
+        x = x + self.pos_embed[:, 1:, :]
+        # append cls token
+        cls_token = self.cls_token + self.pos_embed[:, :1, :]
+        cls_tokens = cls_token.expand(x.shape[0], -1, -1)
+        x = torch.cat((cls_tokens, x), dim=1)
+
+        # apply Transformer blocks
+        outputs = []
+        for i, block in enumerate(self.blocks):
+            x = block(x)
+            if i in self.out_indices:
+                out = x[:, 1:]
+                B, _, C = out.shape
+                out = out.reshape(B, self.hw, self.hw, C).permute(0, 3, 1, 2).contiguous()
+                outputs.append(out)
+
+        return outputs
 
     def forward_features(self, x: Tensor, wavelengths: list[float]) -> Tensor:
         """Forward pass of the feature embedding layer.

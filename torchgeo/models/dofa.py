@@ -312,7 +312,7 @@ class DOFA(nn.Module):
 
         self.hw = img_size // self.patch_embed.kernel_size
 
-        self.waves = None
+        self.waves = torch.zeros(0)
 
     def forward_features_unpooled(self, x: Tensor, wavelengths: list[float]) -> Tensor:
         """Forward pass of the feature embedding layer.

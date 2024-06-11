@@ -370,8 +370,7 @@ class DOFA(nn.Module):
             x = block(x)
             if i in self.out_indices:
                 out = x[:, 1:]
-                B, _, C = out.shape
-                out = out.reshape(B, self.hw, self.hw, C).permute(0, 3, 1, 2).contiguous()
+                out = out.reshape(out.shape[0], self.hw, self.hw, out.shape[2]).permute(0, 3, 1, 2).contiguous()
                 outputs.append(out)
 
         return outputs

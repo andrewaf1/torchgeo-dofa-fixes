@@ -163,6 +163,8 @@ class DOFAEmbedding(nn.Module):
         self._num_kernel = self.kernel_size * self.kernel_size * self.embed_dim
         self.patch_size = (kernel_size, kernel_size)
         self.num_patches = -1
+        
+        self.waves = None
 
         self.weight_generator = TransformerWeightGenerator(
             dynamic_embed_dim, self._num_kernel, embed_dim

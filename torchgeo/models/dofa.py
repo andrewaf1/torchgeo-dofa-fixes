@@ -342,7 +342,7 @@ class DOFA(nn.Module):
 
         return x[:, 1:, :]
     
-    def forward_spatial_features(self, x: Tensor, wavelengths: list[float]) -> list[Tensor]:
+    def forward_spatial_features(self, x: Tensor, wavelengths: Tensor) -> list[Tensor]:
         """Forward pass of the feature embedding layer.
 
         Args:

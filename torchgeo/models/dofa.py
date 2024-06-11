@@ -163,8 +163,6 @@ class DOFAEmbedding(nn.Module):
         self._num_kernel = self.kernel_size * self.kernel_size * self.embed_dim
         self.patch_size = (kernel_size, kernel_size)
         self.num_patches = -1
-        
-        self.waves = None
 
         self.weight_generator = TransformerWeightGenerator(
             dynamic_embed_dim, self._num_kernel, embed_dim
@@ -313,6 +311,8 @@ class DOFA(nn.Module):
         )
 
         self.hw = img_size // self.patch_embed.kernel_size
+
+        self.waves = None
 
     def forward_features_unpooled(self, x: Tensor, wavelengths: list[float]) -> Tensor:
         """Forward pass of the feature embedding layer.

@@ -353,7 +353,7 @@ class DOFA(nn.Module):
             Output mini-batch.
         """
         # embed patches
-        wavelist = torch.tensor(wavelengths, device=x.device).float()
+        wavelist = wavelengths.float()
         self.waves = wavelist
 
         x, _ = self.patch_embed(x, self.waves)

@@ -31,12 +31,23 @@ NAIP
 
 .. autoclass:: NAIPChesapeakeDataModule
 
+I/O Bench
+^^^^^^^^^
+
+.. autoclass:: IOBenchDataModule
+
 Sentinel
 ^^^^^^^^
 
 .. autoclass:: Sentinel2CDLDataModule
+.. autoclass:: Sentinel2EuroCropsDataModule
 .. autoclass:: Sentinel2NCCMDataModule
 .. autoclass:: Sentinel2SouthAmericaSoybeanDataModule
+
+SouthAfricaCropType
+^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: SouthAfricaCropTypeDataModule
 
 Non-geospatial DataModules
 --------------------------
@@ -45,6 +56,11 @@ BigEarthNet
 ^^^^^^^^^^^
 
 .. autoclass:: BigEarthNetDataModule
+
+CaBuAr
+^^^^^^
+
+.. autoclass:: CaBuArDataModule
 
 ChaBuD
 ^^^^^^
@@ -61,6 +77,11 @@ Deep Globe Land Cover Challenge
 
 .. autoclass:: DeepGlobeLandCoverDataModule
 
+Digital Typhoon
+^^^^^^^^^^^^^^^
+
+.. autoclass:: DigitalTyphoonDataModule
+
 ETCI2021 Flood Detection
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -70,6 +91,7 @@ EuroSAT
 ^^^^^^^
 
 .. autoclass:: EuroSATDataModule
+.. autoclass:: EuroSATSpatialDataModule
 .. autoclass:: EuroSAT100DataModule
 
 FAIR1M
@@ -81,6 +103,11 @@ FireRisk
 ^^^^^^^^
 
 .. autoclass:: FireRiskDataModule
+
+GeoNRW
+^^^^^^
+
+.. autoclass:: GeoNRWDataModule
 
 GID-15
 ^^^^^^
@@ -96,6 +123,7 @@ LandCover.ai
 ^^^^^^^^^^^^
 
 .. autoclass:: LandCoverAIDataModule
+.. autoclass:: LandCoverAI100DataModule
 
 LEVIR-CD
 ^^^^^^^^
@@ -126,6 +154,11 @@ Potsdam
 ^^^^^^^
 
 .. autoclass:: Potsdam2DDataModule
+
+QuakeSet
+^^^^^^^^
+
+.. autoclass:: QuakeSetDataModule
 
 RESISC45
 ^^^^^^^^

@@ -367,7 +367,7 @@ class DOFA(nn.Module):
         for i, block in enumerate(self.blocks):
             x = block(x)
             if i in self.out_indices:
-                out = x[:, 1:]
+                out = self.norm(x[:, 1:])
                 out = out.reshape(out.shape[0], self.hw, self.hw, out.shape[2]).permute(0, 3, 1, 2).contiguous()
                 outputs.append(out)
 

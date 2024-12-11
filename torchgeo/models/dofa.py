@@ -221,6 +221,10 @@ class DOFAEmbedding(nn.Module):
 
         return x, waves
 
+@torch.jit.interface
+class ModuleInterface(torch.nn.Module):
+    def forward(self, input: torch.Tensor) -> torch.Tensor: # `input` has a same name in Sequential forward
+        pass
 
 class DOFA(nn.Module):
     """Dynamic One-For-All (DOFA) model.
@@ -274,9 +278,9 @@ class DOFA(nn.Module):
         if self.global_pool:
             norm_layer = norm_layer
             embed_dim = embed_dim
-            self.norm = norm_layer(embed_dim)
-        else:
-            self.norm = norm_layer(embed_dim)
+            #self.norm = norm_layer(embed_dim)
+        #else:
+            #self.norm = norm_layer(embed_dim)
 
         # --------------------------------------------------------------------------
         # MAE encoder specifics
@@ -303,6 +307,13 @@ class DOFA(nn.Module):
             ]
         )
 
+        self.norm : nn.ModuleDict[str: nn.LayerNorm]  = nn.ModuleDict(
+            {
+                str(i): nn.LayerNorm(embed_dim) #norm_layer(embed_dim)
+                for i in out_indices
+            }
+        )
+
         self.head_drop = nn.Dropout(drop_rate)
         self.head = (
             nn.Linear(embed_dim, num_classes) if num_classes > 0 else nn.Identity()
@@ -312,6 +323,7 @@ class DOFA(nn.Module):
 
         self.waves = torch.zeros(0)
 
+    @torch.jit.unused
     def forward_features_unpooled(self, x: Tensor, wavelengths: list[float]) -> Tensor:
         """Forward pass of the feature embedding layer.
 
@@ -367,12 +379,14 @@ class DOFA(nn.Module):
         for i, block in enumerate(self.blocks):
             x = block(x)
             if i in self.out_indices:
-                out = self.norm(x[:, 1:])
+                norm : ModuleInterface = self.norm[str(i)] # for torchscript
+                out = norm.forward(x[:, 1:]) 
                 out = out.reshape(out.shape[0], self.hw, self.hw, out.shape[2]).permute(0, 3, 1, 2).contiguous()
                 outputs.append(out)
 
         return outputs
 
+    @torch.jit.unused
     def forward_features(self, x: Tensor, wavelengths: list[float]) -> Tensor:
         """Forward pass of the feature embedding layer.
 
@@ -407,6 +421,7 @@ class DOFA(nn.Module):
             outcome = x[:, 0]
         return outcome
 
+    @torch.jit.unused
     def forward_head(self, x: Tensor, pre_logits: bool = False) -> Tensor:
         """Forward pass of the attention head.
 
@@ -421,6 +436,7 @@ class DOFA(nn.Module):
         x = x if pre_logits else self.head(x)
         return x
 
+    @torch.jit.unused
     def forward(self, x: Tensor, wavelengths: list[float]) -> Tensor:
         """Forward pass of the model.
 
